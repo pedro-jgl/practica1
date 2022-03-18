@@ -103,9 +103,72 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 	//Decidir qué acción tomar
 	girar_derecha = (rand()%2==0);
+	girar = rand() % 5;
+	entrar = rand() % 10;
 
-	if ( (sensores.terreno[2] == 'T' or sensores.terreno[2] == 'S' or sensores.terreno[2] == 'G') and sensores.superficie[2] == '_'){
-		accion = actFORWARD;
+	if (sensores.terreno[0] == 'K')
+		bikini = true;
+	if (sensores.terreno[0] == 'D')
+		zapatillas = true;
+
+	
+	if ( sensores.terreno[2] != 'M' and sensores.terreno[2] != 'P' and sensores.superficie[2] == '_'){
+		if (bikini and zapatillas){
+			if (girar < 4)
+				accion = actFORWARD;
+			else{
+				if (girar_derecha)
+					accion = actTURN_R;
+				else
+					accion = actTURN_L;
+			}
+
+		}
+		else if (zapatillas){
+			if ( sensores.terreno[2] == 'A'){
+				if (girar_derecha)
+					accion = actTURN_R;
+				else
+					accion = actTURN_L;
+			}
+			else{
+				if (girar < 4)
+					accion = actFORWARD;
+				else{
+					if (girar_derecha)
+						accion = actTURN_R;
+					else
+						accion = actTURN_L;
+				}
+			}
+		}
+		else if (bikini){
+			if ( sensores.terreno[2] == 'B'){
+				if (girar_derecha)
+					accion = actTURN_R;
+				else
+					accion = actTURN_L;
+			}
+			else{
+				if (girar < 4)
+					accion = actFORWARD;
+				else{
+					if (girar_derecha)
+						accion = actTURN_R;
+					else
+						accion = actTURN_L;
+				}
+			}
+		}
+		else{
+			if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A'){
+				if (girar_derecha){
+					accion = actTURN_R;
+				} else{
+					accion = actTURN_L;
+				}
+			}
+		}	
 	} else{
 		if (girar_derecha){
 			accion = actTURN_R;
