@@ -101,7 +101,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 	
 
 
-	//Decidir qué acción tomar de manera aleatoria
+	//Decidir qué acción tomar
 	girar_derecha = (rand()%2==0);
 	girar = rand() % 5;
 	entrar = rand() % 10;
