@@ -8,6 +8,8 @@ using namespace std;
 // Tamaño máximo del mapa
 const int TAM_MAX = 100;
 
+// Prueba
+
 class ComportamientoJugador : public Comportamiento{
 
   public:
