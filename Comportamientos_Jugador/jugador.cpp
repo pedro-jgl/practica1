@@ -103,8 +103,8 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 	//Decidir qué acción tomar
 	girar_derecha = (rand()%2==0);
-	girar = rand() % 5;
-	entrar = rand() % 10;
+	girar = rand() % 9;
+	entrar = rand() % 16;
 
 	if (sensores.terreno[0] == 'K')
 		bikini = true;
@@ -114,7 +114,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 	
 	if ( sensores.terreno[2] != 'M' and sensores.terreno[2] != 'P' and sensores.superficie[2] == '_'){
 		if (bikini and zapatillas){
-			if (girar < 4)
+			if (girar < 7)
 				accion = actFORWARD;
 			else{
 				if (girar_derecha)
@@ -132,7 +132,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 					accion = actTURN_L;
 			}
 			else{
-				if (girar < 4)
+				if (girar < 7)
 					accion = actFORWARD;
 				else{
 					if (girar_derecha)
@@ -150,7 +150,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 					accion = actTURN_L;
 			}
 			else{
-				if (girar < 4)
+				if (girar < 7)
 
 					accion = actFORWARD;
 				else{
@@ -163,7 +163,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 		}
 		else{
 			if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A'){
-				if (entrar < 9){
+				if (entrar < 15){
 					if (girar_derecha){
 						accion = actTURN_R;
 					} else{
@@ -175,7 +175,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 				}
 			}
 			else{
-				if (girar < 4)
+				if (girar < 7)
 					accion = actFORWARD;
 				else{
 					if (girar_derecha)
