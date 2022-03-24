@@ -151,6 +151,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 			}
 			else{
 				if (girar < 4)
+
 					accion = actFORWARD;
 				else{
 					if (girar_derecha)
@@ -162,10 +163,25 @@ Action ComportamientoJugador::think(Sensores sensores){
 		}
 		else{
 			if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A'){
-				if (girar_derecha){
-					accion = actTURN_R;
-				} else{
-					accion = actTURN_L;
+				if (entrar < 9){
+					if (girar_derecha){
+						accion = actTURN_R;
+					} else{
+						accion = actTURN_L;
+					}
+				}
+				else{
+					accion = actFORWARD;
+				}
+			}
+			else{
+				if (girar < 4)
+					accion = actFORWARD;
+				else{
+					if (girar_derecha)
+						accion = actTURN_R;
+					else
+						accion = actTURN_L;
 				}
 			}
 		}	
