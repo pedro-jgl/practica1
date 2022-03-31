@@ -19,6 +19,7 @@ class ComportamientoJugador : public Comportamiento{
       girar_derecha = false;
       bien_situado = false;
       bikini = zapatillas = false;
+      iniciado = false;
       entrar = 0;
       girar = 0;
       ultimaAccion = actIDLE;
@@ -51,7 +52,7 @@ class ComportamientoJugador : public Comportamiento{
   //g_x, g_y guardan donde está la casilla 'G' de posicionamiento en nuestro mapaCiego para
   //poder trasladarlo al mapaResultado una vez posicionados
   int fil, col, brujula, tamMapa, desfase_x, desfase_y, girar, entrar;
-  bool girar_derecha, bien_situado, bikini, zapatillas;
+  bool girar_derecha, bien_situado, bikini, zapatillas, iniciado;
   Action ultimaAccion;
   vector< vector< unsigned char> > mapaCiego;
   vector< vector< unsigned char> > * punteroMapa;

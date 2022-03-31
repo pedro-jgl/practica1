@@ -35,12 +35,13 @@ Action ComportamientoJugador::think(Sensores sensores){
 	if (sensores.nivel < 2)
 		brujula = sensores.sentido;
 
-	if (sensores.nivel == 0){
+	if (sensores.nivel == 0 and !iniciado){
 		bien_situado = true;
 		punteroMapa = &mapaResultado;
 		fil = sensores.posF;
 		col = sensores.posC;
 	}
+	iniciado = true;
 	
 	switch(ultimaAccion){
 		case actFORWARD:
