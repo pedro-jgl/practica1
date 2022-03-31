@@ -41,6 +41,7 @@ class ComportamientoJugador : public Comportamiento{
     ~ComportamientoJugador(){}
 
     Action think(Sensores sensores);
+    void calculaMovimientos(int i);
     int interact(Action accion, int valor);
 
   private:
@@ -54,6 +55,7 @@ class ComportamientoJugador : public Comportamiento{
   Action ultimaAccion;
   vector< vector< unsigned char> > mapaCiego;
   vector< vector< unsigned char> > * punteroMapa;
+  vector<Action> vectorAcciones;
 };
 
 #endif
