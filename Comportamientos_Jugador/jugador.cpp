@@ -34,6 +34,13 @@ Action ComportamientoJugador::think(Sensores sensores){
 	//Actualizar variables de estado
 	if (sensores.nivel < 2)
 		brujula = sensores.sentido;
+
+	if (sensores.nivel == 0){
+		bien_situado = true;
+		punteroMapa = &mapaResultado;
+		fil = sensores.posF;
+		col = sensores.posC;
+	}
 	
 	switch(ultimaAccion){
 		case actFORWARD:
@@ -115,7 +122,6 @@ Action ComportamientoJugador::think(Sensores sensores){
 	tengo_mejoras.push_back(&bikini);
 	tengo_mejoras.push_back(&zapatillas);
 
-
 	for (int i = 0; i <3 and !encontrada; i++){
 		for (int j = 1; j < sensores.terreno.size() and !(*tengo_mejoras[i]); j++){
 			if (sensores.terreno[j] == mejoras[i]){
@@ -192,6 +198,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 			}
 			else{
 				if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A'){
+					//Añadir que si ya has entrado sin zapas, no gire pq gasta  mucho
 					if (entrar < 19){
 						if (girar_derecha){
 							accion = actTURN_R;
@@ -225,6 +232,14 @@ Action ComportamientoJugador::think(Sensores sensores){
 	else{
 		accion = vectorAcciones.back();
 		vectorAcciones.pop_back();
+
+		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_' ) ){
+			vectorAcciones.clear();
+			girar_derecha = (rand()%2==0);
+			accion = actTURN_L;
+			if (girar_derecha)
+				accion = actTURN_R;
+		}
 	}
 	ultimaAccion = accion;
 
