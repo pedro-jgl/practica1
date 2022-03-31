@@ -83,7 +83,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 				mapaResultado[i][j] = mapaCiego[i-desfase_x][j-desfase_y];
 	}
 	
-	
+
 	switch(brujula){
 		case 0:
 			for (int i = 0; i < 4; i++)
@@ -198,7 +198,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 				}
 			}
 			else{
-				if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A'){
+				if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A' ){
 					//Añadir que si ya has entrado sin zapas, no gire pq gasta  mucho
 					if (entrar < 19){
 						if (girar_derecha){
