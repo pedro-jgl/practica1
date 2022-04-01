@@ -32,6 +32,23 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 
 	//Actualizar variables de estado
+	if (sensores.reset){
+		mapaCiego.clear();
+		vector<unsigned char> aux(2*TAM_MAX, '?');
+
+      	for (unsigned int i = 0; i < 2*TAM_MAX; i++)
+        	mapaCiego.push_back(aux);
+
+		fil = col = TAM_MAX-1;
+		brujula = 0;
+		bien_situado = false;
+		punteroMapa = &mapaCiego;
+		
+		vectorAcciones.clear();
+
+		ultimaAccion = actIDLE;
+	}
+
 	if (sensores.nivel < 2)
 		brujula = sensores.sentido;
 
@@ -77,10 +94,11 @@ Action ComportamientoJugador::think(Sensores sensores){
 		desfase_y = sensores.posC - col;
 		fil = sensores.posF;
 		col = sensores.posC;
-
 		for (int i = 0; i < tamMapa; i++)
 			for (int j = 0; j < tamMapa; j++)
-				mapaResultado[i][j] = mapaCiego[i-desfase_x][j-desfase_y];
+				if (mapaResultado[i][j] == '?'){
+					mapaResultado[i][j] = mapaCiego[i-desfase_x][j-desfase_y];
+				}
 	}
 	
 
@@ -151,7 +169,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 		if ( sensores.terreno[2] != 'M' and sensores.terreno[2] != 'P' and sensores.superficie[2] == '_'){
 			if (zapatillas and bikini){
-				if ( rand() % 21 < 20 )
+				if ( rand() % 31 < 30 )
 						accion = actFORWARD;
 					else{
 						if (girar_derecha)
@@ -167,8 +185,8 @@ Action ComportamientoJugador::think(Sensores sensores){
 					else
 						accion = actTURN_L;
 				}
-				else{
-					if ( rand() % 21 < 20 )
+				else{ 
+					if ( rand() % 31 < 30 )
 						accion = actFORWARD;
 					else{
 						if (girar_derecha)
@@ -186,7 +204,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 						accion = actTURN_L;
 				}
 				else{
-					if ( rand() % 21 < 20 )
+					if ( rand() % 31 < 30 )
 						accion = actFORWARD;
 					else{
 						if (girar_derecha)
@@ -207,7 +225,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 						accion = actTURN_L;
 				}
 				else{
-					if ( rand() % 21 < 20 )
+					if ( rand() % 31 < 30 )
 						accion = actFORWARD;
 					else{
 						if (girar_derecha)
