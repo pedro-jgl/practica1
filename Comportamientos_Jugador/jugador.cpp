@@ -110,31 +110,34 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 
 	//Decidir qué acción tomar+
+	if ( vectorAcciones.empty() ){
+		//Aquí vemos si en nuestro campo de visión hay casillas de posicionamiento, bikini y zapatillas
+		bool encontrada = false;
+		int pos_mejora = -1;
+		vector<unsigned char> mejoras;
+		mejoras.push_back('G');
+		mejoras.push_back('K');
+		mejoras.push_back('D');
+		vector<bool *> tengo_mejoras;
+		tengo_mejoras.push_back(&bien_situado);
+		tengo_mejoras.push_back(&bikini);
+		tengo_mejoras.push_back(&zapatillas);
 
-	//Aquí vemos si en nuestro campo de visión hay casillas de posicionamiento, bikini y zapatillas
-	bool encontrada = false;
-	int pos_mejora = -1;
-	vector<unsigned char> mejoras;
-	mejoras.push_back('G');
-	mejoras.push_back('K');
-	mejoras.push_back('D');
-	vector<bool *> tengo_mejoras;
-	tengo_mejoras.push_back(&bien_situado);
-	tengo_mejoras.push_back(&bikini);
-	tengo_mejoras.push_back(&zapatillas);
-
-	for (int i = 0; i <3 and !encontrada; i++){
-		for (int j = 1; j < sensores.terreno.size() and !(*tengo_mejoras[i]); j++){
-			if (sensores.terreno[j] == mejoras[i]){
-				encontrada = true;
-				pos_mejora = j;
+		for (int i = 0; i < 3 and !encontrada; i++){
+			for (int j = 1; j < sensores.terreno.size() and !(*tengo_mejoras[i]); j++){
+				if (sensores.terreno[j] == mejoras[i]){
+					encontrada = true;
+					pos_mejora = j;
+				}
 			}
 		}
-	}
 
-	calculaMovimientos(pos_mejora);
-	encontrada = false;
-	pos_mejora = -1;
+		calculaMovimientos(pos_mejora);
+		encontrada = false;
+		pos_mejora = -1;
+
+		
+	}
 
 
 	if (sensores.terreno[0] == 'K')
@@ -145,20 +148,17 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 	if (vectorAcciones.empty()){
 		girar_derecha = (rand()%2==0);
-		girar = rand() % 18;
-		entrar = rand() % 20;
 
 		if ( sensores.terreno[2] != 'M' and sensores.terreno[2] != 'P' and sensores.superficie[2] == '_'){
-			if (bikini and zapatillas){
-				if (girar < 16)
-					accion = actFORWARD;
-				else{
-					if (girar_derecha)
+			if (zapatillas and bikini){
+				if ( rand() % 21 < 20 )
+						accion = actFORWARD;
+					else{
+						if (girar_derecha)
 						accion = actTURN_R;
 					else
 						accion = actTURN_L;
-				}
-
+					}
 			}
 			else if (zapatillas){
 				if ( sensores.terreno[2] == 'A'){
@@ -168,13 +168,13 @@ Action ComportamientoJugador::think(Sensores sensores){
 						accion = actTURN_L;
 				}
 				else{
-					if (girar < 16)
+					if ( rand() % 21 < 20 )
 						accion = actFORWARD;
 					else{
 						if (girar_derecha)
-							accion = actTURN_R;
-						else
-							accion = actTURN_L;
+						accion = actTURN_R;
+					else
+						accion = actTURN_L;
 					}
 				}
 			}
@@ -186,43 +186,40 @@ Action ComportamientoJugador::think(Sensores sensores){
 						accion = actTURN_L;
 				}
 				else{
-					if (girar < 16)
-
+					if ( rand() % 21 < 20 )
 						accion = actFORWARD;
 					else{
 						if (girar_derecha)
-							accion = actTURN_R;
-						else
-							accion = actTURN_L;
+						accion = actTURN_R;
+					else
+						accion = actTURN_L;
 					}
 				}
 			}
 			else{
-				if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A' ){
-					//Añadir que si ya has entrado sin zapas, no gire pq gasta  mucho
-					if (entrar < 19){
-						if (girar_derecha){
-							accion = actTURN_R;
-						} else{
-							accion = actTURN_L;
-						}
-					}
-					else{
-						accion = actFORWARD;
-					}
+				if ( (sensores.terreno[2] == 'B' and sensores.terreno[0] == 'B') or (sensores.terreno[2] == 'A' and sensores.terreno[0] == 'A') ){
+					accion = actFORWARD;
+				}
+				else if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A' ){
+					if (girar_derecha)
+						accion = actTURN_R;
+					else
+						accion = actTURN_L;
 				}
 				else{
-					if (girar < 16)
+					if ( rand() % 21 < 20 )
 						accion = actFORWARD;
 					else{
 						if (girar_derecha)
-							accion = actTURN_R;
-						else
-							accion = actTURN_L;
+						accion = actTURN_R;
+					else
+						accion = actTURN_L;
 					}
 				}
-			}	
-		} else{
+
+			}
+		}
+		else{
 			if (girar_derecha){
 				accion = actTURN_R;
 			} else{
