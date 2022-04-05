@@ -325,3 +325,31 @@ void ComportamientoJugador::calculaMovimientos(int i){
 		aux.pop_back();
 	}
 }
+
+/**
+int ComportamientoJugador::pasable(Sensores sensores){
+	int primeraLinea = 4, segundaLinea = 9, finLineas = 16;
+	vector<int> v;
+	v.push_back(1);
+	v.push_back(primeraLinea);
+	v.push_back(segundaLinea);
+	v.push_back(finaLineas);
+	int hueco = 0;
+	bool pasable = false;
+
+	for (int j = 0; j < 3; j++){
+		for (int i = v[j]; i < v[j+1]; i++){
+			if (sensores.terreno[i] != 'M' and sensores.terreno[i] != 'P' and sensores.superficie[i] == '_'){
+				pasable = true;
+				hueco = i;
+			}
+
+			if (!pasable){
+				hueco = 16;
+				return hueco;
+			}
+
+			pasable = false;
+		}
+	}
+}**/

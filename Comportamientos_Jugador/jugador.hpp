@@ -31,9 +31,12 @@ class ComportamientoJugador : public Comportamiento{
       desfase_x = desfase_y = -1;
 
       vector<unsigned char> aux(2*TAM_MAX, '?');
+      vector<unsigned int> aux2(2*TAM_MAX, 0);
 
-      for (unsigned int i = 0; i < 2*TAM_MAX; i++)
+      for (unsigned int i = 0; i < 2*TAM_MAX; i++){
         mapaCiego.push_back(aux);
+        mapaPisadas.push_back(aux2);
+      }
 
       punteroMapa = &mapaCiego;
     }
@@ -44,6 +47,8 @@ class ComportamientoJugador : public Comportamiento{
     Action think(Sensores sensores);
     void calculaMovimientos(int i);
     int interact(Action accion, int valor);
+    //Devuelve 0 si se puede pasar, 1 <= i <= 15 si hay muros, pero se ve algún hueco, y 16 si no se puede pasar de ninguna manera
+    //int pasable(Sensores sensores);
 
   private:
   
@@ -56,6 +61,7 @@ class ComportamientoJugador : public Comportamiento{
   Action ultimaAccion;
   vector< vector< unsigned char> > mapaCiego;
   vector< vector< unsigned char> > * punteroMapa;
+  vector< vector< unsigned int> > mapaPisadas, mapaPisadas_aux;
   vector<Action> vectorAcciones;
 };
 
