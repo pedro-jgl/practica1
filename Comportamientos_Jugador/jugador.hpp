@@ -25,13 +25,13 @@ class ComportamientoJugador : public Comportamiento{
       ultimaAccion = actIDLE;
 
        // Posición inicial en el mapa ciego, la mitad del doble del máximo (200) menos uno
-      fil = col = TAM_MAX-1;
+      fil = col = fil_pasos = col_pasos = TAM_MAX-1;
       tamMapa = size;
 
       desfase_x = desfase_y = -1;
 
       vector<unsigned char> aux(2*TAM_MAX, '?');
-      vector<unsigned int> aux2(2*TAM_MAX, 0);
+      vector<float> aux2(2*TAM_MAX, 0);
 
       for (unsigned int i = 0; i < 2*TAM_MAX; i++){
         mapaCiego.push_back(aux);
@@ -39,6 +39,7 @@ class ComportamientoJugador : public Comportamiento{
       }
 
       punteroMapa = &mapaCiego;
+      en_camino = false;
     }
 
     ComportamientoJugador(const ComportamientoJugador & comport) : Comportamiento(comport){}
@@ -47,8 +48,7 @@ class ComportamientoJugador : public Comportamiento{
     Action think(Sensores sensores);
     void calculaMovimientos(int i);
     int interact(Action accion, int valor);
-    //Devuelve 0 si se puede pasar, 1 <= i <= 15 si hay muros, pero se ve algún hueco, y 16 si no se puede pasar de ninguna manera
-    //int pasable(Sensores sensores);
+    int lugarMenosVisitado(int brujula);
 
   private:
   
@@ -56,12 +56,12 @@ class ComportamientoJugador : public Comportamiento{
 
   //g_x, g_y guardan donde está la casilla 'G' de posicionamiento en nuestro mapaCiego para
   //poder trasladarlo al mapaResultado una vez posicionados
-  int fil, col, brujula, tamMapa, desfase_x, desfase_y, girar, entrar;
-  bool girar_derecha, bien_situado, bikini, zapatillas, iniciado;
+  int fil, col, fil_pasos, col_pasos, brujula, tamMapa, desfase_x, desfase_y, girar, entrar;
+  bool girar_derecha, bien_situado, bikini, zapatillas, iniciado, en_camino;
   Action ultimaAccion;
   vector< vector< unsigned char> > mapaCiego;
   vector< vector< unsigned char> > * punteroMapa;
-  vector< vector< unsigned int> > mapaPisadas, mapaPisadas_aux;
+  vector< vector< float > > mapaPisadas, mapaPisadas_aux;
   vector<Action> vectorAcciones;
 };
 
