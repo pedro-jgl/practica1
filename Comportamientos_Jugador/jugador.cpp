@@ -109,20 +109,36 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 	if (sensores.terreno[0] == 'G' and !bien_situado){
 		if (recuperarPisadas){
-			fil_aux = sensores.posF - desfase_x;
-			col_aux = sensores.posC - desfase_y;
+			desfase_antiguox = desfase_x;		//fila de la casilla G en el mapaPisadas antiguo (ahora mapaPisadas_aux)
+			desfase_antiguoy = desfase_y;		//columna de la casilla G en el mapaPisadas antiguo (ahora mapaPisadas_aux)
 			//********************************************* ACABAR ESTE PASO ********************************************************************//
-			for (int i = 0; i < mapaPisadas_aux.size(); i++)
-				for (int j = 0; j < mapaPisadas_aux.size(); j++)
-					mapaPisadas[i][j] += mapaPisadas_aux[i][j];
+			desfase_x = sensores.posF - fil;
+			desfase_y = sensores.posC - col;
+			nuevoDesfase_x = desfase_antiguox - desfase_x;
+			nuevoDesfase_y = desfase_antiguoy - desfase_y;
+			fil_aux = -nuevoDesfase_x;
+			col_aux = -nuevoDesfase_y;
+			for (int i = 0; i < mapaPisadas.size(); i++)
+				for (int j = 0; j < mapaPisadas.size(); j++){
+					col_aux++;
+					if (col_aux == mapaPisadas.size()){
+						col_aux = 0;
+						fil_aux++;
+						fil_aux = fil_aux % mapaPisadas.size();
+					}
+
+					mapaPisadas[i][j] += mapaPisadas_aux[fil_aux][col_aux];
+				}
 			
 			mapaPisadas_aux.clear();
 			recuperarPisadas = false;
 		}
 		bien_situado = true;
 		punteroMapa = &mapaResultado;
-		desfase_x = sensores.posF - fil;
-		desfase_y = sensores.posC - col;
+		if (!recuperarPisadas){
+			desfase_x = sensores.posF - fil;
+			desfase_y = sensores.posC - col;
+		}
 		fil = sensores.posF;
 		col = sensores.posC;
 		for (int i = 0; i < tamMapa; i++)

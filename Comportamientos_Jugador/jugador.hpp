@@ -44,6 +44,7 @@ class ComportamientoJugador : public Comportamiento{
       fil_aux = col_aux = 0;
       algunaVezSituado = false;
       primera_iter = true;
+      nuevoDesfase_x = nuevoDesfase_y = desfase_antiguox = desfase_antiguoy = -1;
     }
 
     ComportamientoJugador(const ComportamientoJugador & comport) : Comportamiento(comport){}
@@ -62,7 +63,7 @@ class ComportamientoJugador : public Comportamiento{
 
   //g_x, g_y guardan donde está la casilla 'G' de posicionamiento en nuestro mapaCiego para
   //poder trasladarlo al mapaResultado una vez posicionados
-  int fil, col, fil_pasos, col_pasos, brujula, tamMapa, desfase_x, desfase_y, fil_aux, col_aux;
+  int fil, col, fil_pasos, col_pasos, brujula, tamMapa, desfase_x, desfase_y, fil_aux, col_aux, nuevoDesfase_x, nuevoDesfase_y, desfase_antiguox, desfase_antiguoy;
   bool girar_derecha, bien_situado, bikini, zapatillas, iniciado, en_camino, bateria_llena, recuperarPisadas, algunaVezSituado, primera_iter;
   Action ultimaAccion;
   vector< vector< unsigned char> > mapaCiego;
