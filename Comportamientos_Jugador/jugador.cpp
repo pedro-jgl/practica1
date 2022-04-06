@@ -33,7 +33,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 	//Actualizar variables de estado
 	if (sensores.reset){
-		primera_iter = true;
+		fuera = false;
 
 		mapaCiego.clear();
 		vector<unsigned char> aux(2*TAM_MAX, '?');
@@ -168,96 +168,121 @@ Action ComportamientoJugador::think(Sensores sensores){
 		break;
 	}
 
+	if (sensores.terreno[0] != 'A' and sensores.terreno[0] != 'B')
+		fuera = true;
 
-
-	//Decidir qué acción tomar
-	if (sensores.bateria < 1500 and !en_camino)
-		bateria_llena = false;
-	
-	if (sensores.terreno[0] == 'X' and !bateria_llena){
-		for (int i = 0; i < 70; i++)
-			vectorAcciones.push_back(actIDLE);
-
-		en_camino = true;
-		bateria_llena = true;
-	}
-
-	if ( !en_camino ){
-		//Aquí vemos si en nuestro campo de visión hay casillas de posicionamiento, bikini y zapatillas
-		bool encontrada = false;
-		int pos_mejora = -1;
-		vector<unsigned char> mejoras;
-		mejoras.push_back('G');
-		mejoras.push_back('K');
-		mejoras.push_back('D');
-		mejoras.push_back('X');
-		vector<bool *> tengo_mejoras;
-		tengo_mejoras.push_back(&bien_situado);
-		tengo_mejoras.push_back(&bikini);
-		tengo_mejoras.push_back(&zapatillas);
-		tengo_mejoras.push_back(&bateria_llena);
-
-		for (int i = 0; i < 3 and !encontrada; i++){
-			for (int j = 1; j < sensores.terreno.size() and !(*tengo_mejoras[i]); j++){
-				if (sensores.terreno[j] == mejoras[i]){
-					encontrada = true;
-					pos_mejora = j;
-				}
-			}
+	if (!calculandoSalida and !fuera){
+		if (((sensores.terreno[0] == 'A' and sensores.terreno[2] == 'A') and !bikini) or ((sensores.terreno[0] == 'B' and sensores.terreno[2] == 'B') and !zapatillas)){
+			if (!salirAguaBosque)
+				vectorAcciones.push_back(actFORWARD);
+			else
+				fuera = true;
+			
+			calculandoSalida = true;
 		}
-
-		if (encontrada){
-			vectorAcciones.clear();
-			calculaMovimientos(pos_mejora);
-			encontrada = false;
-			pos_mejora = -1;
-			en_camino = true;
-		}
-
+		else
+			fuera = true;
 		
 	}
 
+	if (fuera){
+		//Decidir qué acción tomar
+		if (sensores.bateria < 1500 and !en_camino)
+			bateria_llena = false;
+		
+		if (sensores.terreno[0] == 'X' and !bateria_llena){
+			for (int i = 0; i < 70; i++)
+				vectorAcciones.push_back(actIDLE);
 
-	if (sensores.terreno[0] == 'K')
-		bikini = true;
-	if (sensores.terreno[0] == 'D')
-		zapatillas = true;
-
-
-	if (vectorAcciones.empty()){
-		int destino = lugarMenosVisitado(brujula);
-
-		calculaMovimientos(destino);
-		accion = vectorAcciones.back();
-		vectorAcciones.pop_back();
-
-		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_' or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
-			vectorAcciones.clear();
-			girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : !giraDerecha(brujula);	//Una de cada 5 veces gira al contrario, para romper bucles.
-			accion = actTURN_L;
-			if (girar_derecha)
-				accion = actTURN_R;
+			en_camino = true;
+			bateria_llena = true;
 		}
+
+		if ( !en_camino ){
+			//Aquí vemos si en nuestro campo de visión hay casillas de posicionamiento, bikini y zapatillas
+			bool encontrada = false;
+			int pos_mejora = -1;
+			vector<unsigned char> mejoras;
+			mejoras.push_back('G');
+			mejoras.push_back('K');
+			mejoras.push_back('D');
+			mejoras.push_back('X');
+			vector<bool *> tengo_mejoras;
+			tengo_mejoras.push_back(&bien_situado);
+			tengo_mejoras.push_back(&bikini);
+			tengo_mejoras.push_back(&zapatillas);
+			tengo_mejoras.push_back(&bateria_llena);
+
+			for (int i = 0; i < 3 and !encontrada; i++){
+				for (int j = 1; j < sensores.terreno.size() and !(*tengo_mejoras[i]); j++){
+					if (sensores.terreno[j] == mejoras[i]){
+						encontrada = true;
+						pos_mejora = j;
+					}
+				}
+			}
+
+			if (encontrada){
+				vectorAcciones.clear();
+				calculaMovimientos(pos_mejora);
+				encontrada = false;
+				pos_mejora = -1;
+				en_camino = true;
+			}
+
+			
+		}
+
+
+		if (sensores.terreno[0] == 'K')
+			bikini = true;
+		if (sensores.terreno[0] == 'D')
+			zapatillas = true;
+
+
+		if (vectorAcciones.empty()){
+			int destino = lugarMenosVisitado(brujula);
+
+			calculaMovimientos(destino);
+			accion = vectorAcciones.back();
+			vectorAcciones.pop_back();
+
+			if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_' or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
+				vectorAcciones.clear();
+				girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : !giraDerecha(brujula);	//Una de cada 5 veces gira al contrario, para romper bucles.
+				accion = actTURN_L;
+				if (girar_derecha)
+					accion = actTURN_R;
+			}
+		}
+		else{
+			accion = vectorAcciones.back();
+			vectorAcciones.pop_back();
+
+			if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_'  or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
+				vectorAcciones.clear();
+				//girar_derecha = (rand()%2==0);
+				girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : !giraDerecha(brujula);
+				accion = actTURN_L;
+				if (girar_derecha)
+					accion = actTURN_R;
+			}
+
+			if (vectorAcciones.empty())
+				en_camino = false;
+		}
+
+		if (primera_iter)
+			primera_iter = false;
 	}
 	else{
 		accion = vectorAcciones.back();
 		vectorAcciones.pop_back();
 
-		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_'  or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
-			vectorAcciones.clear();
-			//girar_derecha = (rand()%2==0);
-			girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : !giraDerecha(brujula);
-			accion = actTURN_L;
-			if (girar_derecha)
-				accion = actTURN_R;
-		}
-
-		if (vectorAcciones.empty())
-			en_camino = false;
+		if (vectorAcciones.epmty())
+			calculandoSalida = false;
 	}
-
-	if (primera_iter)
-		primera_iter = false;
+	
 
 
 	ultimaAccion = accion;
