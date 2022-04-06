@@ -254,7 +254,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_' or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
 			vectorAcciones.clear();
-			girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : (rand()%2==0);	//Una de cada 5 veces gira aleatoriamente, para romper bucles.
+			girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : !giraDerecha(brujula);	//Una de cada 5 veces gira al contrario, para romper bucles.
 			accion = actTURN_L;
 			if (girar_derecha)
 				accion = actTURN_R;
@@ -267,7 +267,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_'  or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
 			vectorAcciones.clear();
 			//girar_derecha = (rand()%2==0);
-			girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : (rand()%2==0);
+			girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : !giraDerecha(brujula);
 			accion = actTURN_L;
 			if (girar_derecha)
 				accion = actTURN_R;
