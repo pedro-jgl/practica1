@@ -30,7 +30,6 @@ Action ComportamientoJugador::think(Sensores sensores){
 	cout << "Vida: " << sensores.vida << endl;
 	cout << endl;
 
-
 	//Actualizar variables de estado
 	if (sensores.reset){
 		fuera = false;
@@ -112,7 +111,6 @@ Action ComportamientoJugador::think(Sensores sensores){
 					mapaResultado[i][j] = mapaCiego[i-desfase_x][j-desfase_y];
 				}
 	}
-	
 
 	switch(brujula){
 		case 0:
@@ -168,15 +166,14 @@ Action ComportamientoJugador::think(Sensores sensores){
 		break;
 	}
 
-	if (sensores.terreno[0] != 'A' and sensores.terreno[0] != 'B')
+	if ((sensores.terreno[0] != 'A' or bikini) and (sensores.terreno[0] != 'B' or zapatillas))
 		fuera = true;
 
 	if (!calculandoSalida and !fuera){
-		if (((sensores.terreno[0] == 'A' and sensores.terreno[2] == 'A') and !bikini) or ((sensores.terreno[0] == 'B' and sensores.terreno[2] == 'B') and !zapatillas)){
-			if (!salirAguaBosque)
+		if ((sensores.terreno[0] == 'A' and sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[0] == 'B' and sensores.terreno[2] == 'B' and !zapatillas)){
+			if (!salirAguaBosque(sensores)){
 				vectorAcciones.push_back(actFORWARD);
-			else
-				fuera = true;
+			}
 			
 			calculandoSalida = true;
 		}
@@ -249,7 +246,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 			if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_' or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
 				vectorAcciones.clear();
-				girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : !giraDerecha(brujula);	//Una de cada 5 veces gira al contrario, para romper bucles.
+				girar_derecha = (rand()%3 < 2)? giraDerecha(brujula) : !giraDerecha(brujula);	//Una de cada 5 veces gira al contrario, para romper bucles.
 				accion = actTURN_L;
 				if (girar_derecha)
 					accion = actTURN_R;
@@ -261,8 +258,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 			if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_'  or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
 				vectorAcciones.clear();
-				//girar_derecha = (rand()%2==0);
-				girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : !giraDerecha(brujula);
+				girar_derecha = (rand()%3 < 2)? giraDerecha(brujula) : !giraDerecha(brujula);
 				accion = actTURN_L;
 				if (girar_derecha)
 					accion = actTURN_R;
@@ -271,15 +267,20 @@ Action ComportamientoJugador::think(Sensores sensores){
 			if (vectorAcciones.empty())
 				en_camino = false;
 		}
-
-		if (primera_iter)
-			primera_iter = false;
 	}
 	else{
 		accion = vectorAcciones.back();
 		vectorAcciones.pop_back();
+		cout << "e" << endl;
+		if ( accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_'  ) ){
+				vectorAcciones.clear();
+				girar_derecha = rand()%2;
+				accion = actTURN_L;
+				if (girar_derecha)
+					accion = actTURN_R;
+		}
 
-		if (vectorAcciones.epmty())
+		if (vectorAcciones.empty())
 			calculandoSalida = false;
 	}
 	
@@ -298,7 +299,7 @@ void ComportamientoJugador::calculaMovimientos(int i){
 	int tam;
 	vector<Action> aux;
 
-	if (i > 1){
+	if (i > 0){
 		if (i <= 3){
 			aux.push_back(actFORWARD);
 			if (i != 2){
@@ -490,7 +491,6 @@ bool ComportamientoJugador:: salirAguaBosque(Sensores sensores){
 
 	if (salida)
 		calculaMovimientos(pos);
-	
 	return salida;
 }
 
