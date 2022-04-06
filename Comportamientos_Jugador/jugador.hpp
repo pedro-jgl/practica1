@@ -20,8 +20,6 @@ class ComportamientoJugador : public Comportamiento{
       bien_situado = false;
       bikini = zapatillas = false;
       iniciado = false;
-      entrar = 0;
-      girar = 0;
       ultimaAccion = actIDLE;
 
        // Posición inicial en el mapa ciego, la mitad del doble del máximo (200) menos uno
@@ -36,10 +34,14 @@ class ComportamientoJugador : public Comportamiento{
       for (unsigned int i = 0; i < 2*TAM_MAX; i++){
         mapaCiego.push_back(aux);
         mapaPisadas.push_back(aux2);
+        mapaPisadas_aux.push_back(aux2);
       }
 
       punteroMapa = &mapaCiego;
       en_camino = false;
+      bateria_llena = true;
+      recuperarPisadas = false;
+      fil_aux = col_aux = 0;
     }
 
     ComportamientoJugador(const ComportamientoJugador & comport) : Comportamiento(comport){}
@@ -49,6 +51,7 @@ class ComportamientoJugador : public Comportamiento{
     void calculaMovimientos(int i);
     int interact(Action accion, int valor);
     int lugarMenosVisitado(int brujula);
+    bool giraDerecha(int brujula);
 
   private:
   
@@ -56,8 +59,8 @@ class ComportamientoJugador : public Comportamiento{
 
   //g_x, g_y guardan donde está la casilla 'G' de posicionamiento en nuestro mapaCiego para
   //poder trasladarlo al mapaResultado una vez posicionados
-  int fil, col, fil_pasos, col_pasos, brujula, tamMapa, desfase_x, desfase_y, girar, entrar;
-  bool girar_derecha, bien_situado, bikini, zapatillas, iniciado, en_camino;
+  int fil, col, fil_pasos, col_pasos, brujula, tamMapa, desfase_x, desfase_y, fil_aux, col_aux;
+  bool girar_derecha, bien_situado, bikini, zapatillas, iniciado, en_camino, bateria_llena, recuperarPisadas;
   Action ultimaAccion;
   vector< vector< unsigned char> > mapaCiego;
   vector< vector< unsigned char> > * punteroMapa;

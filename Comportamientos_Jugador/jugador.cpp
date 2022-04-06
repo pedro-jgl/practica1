@@ -39,7 +39,7 @@ Action ComportamientoJugador::think(Sensores sensores){
       	for (unsigned int i = 0; i < 2*TAM_MAX; i++)
         	mapaCiego.push_back(aux);
 
-		fil = col = TAM_MAX-1;
+		fil = col = fil_pasos = col_pasos = TAM_MAX-1;
 		brujula = 0;
 		bien_situado = false;
 		punteroMapa = &mapaCiego;
@@ -47,6 +47,17 @@ Action ComportamientoJugador::think(Sensores sensores){
 		vectorAcciones.clear();
 
 		ultimaAccion = actIDLE;
+
+		for (int i = 0; i < mapaPisadas.size(); i++)
+			for (int i = 0; i < mapaPisadas.size(); i++)
+				mapaPisadas_aux[i][j] = mapaPisadas[i][j];
+
+		mapaPisadas.clear();
+		recuperarPisadas = true;
+		vector<float> aux2(2*TAM_MAX, 0);
+
+      	for (unsigned int i = 0; i < 2*TAM_MAX; i++)
+        	mapaPisadas.push_back(aux2);
 	}
 
 	if (sensores.nivel < 2)
@@ -92,6 +103,17 @@ Action ComportamientoJugador::think(Sensores sensores){
 	}
 
 	if (sensores.terreno[0] == 'G' and !bien_situado){
+		if (recuperarPisadas){
+			fil_aux = sensores.posF - desfase_x;
+			col_aux = sensores.posC - desfase_y;
+			//********************************************* ACABAR ESTE PASO ********************************************************************//
+			for (int i = 0; i < mapaPisadas_aux.size(); i++)
+				for (int j = 0; j < mapaPisadas_aux.size(); j++)
+					mapaPisadas[i][j] += mapaPisadas_aux[][];
+			
+			mapaPisadas_aux.clear();
+			recuperarPisadas = false;
+		}
 		bien_situado = true;
 		punteroMapa = &mapaResultado;
 		desfase_x = sensores.posF - fil;
@@ -126,7 +148,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 					if (j*(j+1)+i == 0)
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 1;
-					else if (i*(i+1)+j < 4)
+					else if (j*(j+1)+i < 4)
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 0.5;
 					else
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 0.25;
@@ -139,7 +161,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 					if (i*(i+1)-j == 0)
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 1;
-					else if (i*(i+1)+j < 4)
+					else if (i*(i+1)-j < 4)
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 0.5;
 					else
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 0.25;
@@ -152,7 +174,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 					if (j*(j+1)-i == 0)
 						mapaPisadas[fil_pasos+i][col_pasos-j] += 1;
-					else if (i*(i+1)+j < 4)
+					else if (j*(j+1)-i < 4)
 						mapaPisadas[fil_pasos+i][col_pasos-j] += 0.5;
 					else
 						mapaPisadas[fil_pasos+i][col_pasos-j] += 0.25;
@@ -162,7 +184,18 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 
 
-	//Decidir qué acción tomar+
+	//Decidir qué acción tomar
+	if (sensores.bateria < 1500 and !en_camino)
+		bateria_llena = false;
+	
+	if (sensores.terreno[0] == 'X' and !bateria_llena){
+		for (int i = 0; i < 70; i++)
+			vectorAcciones.push_back(actIDLE);
+
+		en_camino = true;
+		bateria_llena = true;
+	}
+
 	if ( !en_camino ){
 		//Aquí vemos si en nuestro campo de visión hay casillas de posicionamiento, bikini y zapatillas
 		bool encontrada = false;
@@ -171,10 +204,12 @@ Action ComportamientoJugador::think(Sensores sensores){
 		mejoras.push_back('G');
 		mejoras.push_back('K');
 		mejoras.push_back('D');
+		mejoras.push_back('X');
 		vector<bool *> tengo_mejoras;
 		tengo_mejoras.push_back(&bien_situado);
 		tengo_mejoras.push_back(&bikini);
 		tengo_mejoras.push_back(&zapatillas);
+		tengo_mejoras.push_back(&bateria_llena);
 
 		for (int i = 0; i < 3 and !encontrada; i++){
 			for (int j = 1; j < sensores.terreno.size() and !(*tengo_mejoras[i]); j++){
@@ -213,92 +248,12 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_' or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
 			vectorAcciones.clear();
-			girar_derecha = (rand()%2==0);
+			//girar_derecha = (rand()%2==0);
+			girar_derecha = giraDerecha(brujula);
 			accion = actTURN_L;
 			if (girar_derecha)
 				accion = actTURN_R;
 		}
-		
-		
-		/**
-		if ( sensores.terreno[2] != 'M' and sensores.terreno[2] != 'P' and sensores.superficie[2] == '_'){
-			if (zapatillas and bikini){
-				if ( rand() % 31 < 30 )
-						accion = actFORWARD;
-					else{
-						if (girar_derecha)
-						accion = actTURN_R;
-					else
-						accion = actTURN_L;
-					}
-			}
-			else if (zapatillas){
-				if ( sensores.terreno[2] == 'A'){
-					if (girar_derecha)
-						accion = actTURN_R;
-					else
-						accion = actTURN_L;
-				}
-				else{ 
-					if ( rand() % 31 < 30 )
-						accion = actFORWARD;
-					else{
-						if (girar_derecha)
-						accion = actTURN_R;
-					else
-						accion = actTURN_L;
-					}
-				}
-			}
-			else if (bikini){
-				if ( sensores.terreno[2] == 'B'){
-					if (girar_derecha)
-						accion = actTURN_R;
-					else
-						accion = actTURN_L;
-				}
-				else{
-					if ( rand() % 31 < 30 )
-						accion = actFORWARD;
-					else{
-						if (girar_derecha)
-						accion = actTURN_R;
-					else
-						accion = actTURN_L;
-					}
-				}
-			}
-			else{
-				if ( (sensores.terreno[2] == 'B' and sensores.terreno[0] == 'B') or (sensores.terreno[2] == 'A' and sensores.terreno[0] == 'A') ){
-					accion = actFORWARD;
-				}
-				else if ( sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A' ){
-					if (girar_derecha)
-						accion = actTURN_R;
-					else
-						accion = actTURN_L;
-				}
-				else{
-					if ( rand() % 31 < 30 )
-						accion = actFORWARD;
-					else{
-						if (girar_derecha)
-						accion = actTURN_R;
-					else
-						accion = actTURN_L;
-					}
-				}
-
-			}
-		}
-		else{
-			if (girar_derecha){
-				accion = actTURN_R;
-			} else{
-				accion = actTURN_L;
-			}
-		}
-		**/
 	}
 	else{
 		accion = vectorAcciones.back();
@@ -306,7 +261,8 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_'  or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
 			vectorAcciones.clear();
-			girar_derecha = (rand()%2==0);
+			//girar_derecha = (rand()%2==0);
+			girar_derecha = giraDerecha(brujula);
 			accion = actTURN_L;
 			if (girar_derecha)
 				accion = actTURN_R;
@@ -433,6 +389,80 @@ int ComportamientoJugador:: lugarMenosVisitado(int brujula){
 		pos_min = 12;
 
 	return pos_min;
+}
+
+bool ComportamientoJugador:: giraDerecha(int brujula){
+	int brujD, brujI, tam = mapaPisadas.size(), tope_i, inicio_i, tope_j, inicio_j;
+	double sum = 0;
+	bool girar_derecha = false;
+	vector<int> vbruj;
+	vector<double> valor;
+
+	brujD = (brujula + 1) % 4;
+	brujI = (brujula + 3) % 4;
+	vbruj.push_back(brujD);
+	vbruj.push_back(brujI);
+	valor.push_back(0);
+	valor.push_back(0);
+
+	for (int k = 0; k < 2; k++){
+		sum = 0;
+		switch(vbruj[k]){
+			case 0:
+				inicio_i = 1;
+				tope_i =  (fil_pasos < tamMapa)? fil_pasos : tamMapa;				//min(fil_pasos,tamMapa)
+				inicio_j = (col_pasos < tamMapa)? -col_pasos : -tamMapa;			//-min(col_pasos,tamMapa)
+				tope_j = (tam-col_pasos < tamMapa)? tam-col_pasos : tamMapa;		//min(tam-col_pasos,tamMapa)
+
+				for (int i = inicio_i; i < tope_i; i++)
+					for (int j = inicio_j; j < tope_j; j++)
+						sum += mapaPisadas[fil_pasos-i][col_pasos+j];
+
+				valor[k] = sum / (tope_i-inicio_i)*(tope_j-inicio_j);
+			break;
+			case 1:
+				inicio_i = (fil_pasos < tamMapa)? -fil_pasos : -tamMapa;			//-min(fil_pasos,tamMapa)
+				tope_i =  (tam-fil_pasos < tamMapa)? tam-fil_pasos : tamMapa;		//min(tam-fil_pasos,tamMapa)
+				inicio_j = 1;
+				tope_j = (tam-col_pasos < tamMapa)? tam-col_pasos : tamMapa;		//min(tam-col_pasos,tamMapa)
+				
+				for (int i = inicio_i; i < tope_i; i++)
+					for (int j = inicio_j; j < tope_j; j++)
+						sum += mapaPisadas[fil_pasos+i][col_pasos+j];
+
+				valor[k] = sum / (tope_i-inicio_i)*(tope_j-inicio_j);
+			break;
+			case 2:
+				inicio_i = 1;
+				tope_i =  (tam-fil_pasos < tamMapa)? tam-fil_pasos : tamMapa;		//min(tam-fil_pasos,tamMapa)
+				inicio_j = (col_pasos < tamMapa)? -col_pasos : -tamMapa;			//-min(col_pasos,tamMapa)
+				tope_j = (tam-col_pasos < tamMapa)? tam-col_pasos : tamMapa;		//min(tam-col_pasos,tamMapa)
+				
+				for (int i = inicio_i; i < tope_i; i++)
+					for (int j = inicio_j; j < tope_j; j++)
+						sum += mapaPisadas[fil_pasos+i][col_pasos+j];
+
+				valor[k] = sum / (tope_i-inicio_i)*(tope_j-inicio_j);
+			break;
+			case 3:
+				inicio_i = (fil_pasos < tamMapa)? -fil_pasos : -tamMapa;			//-min(fil_pasos,tamMapa)
+				tope_i =  (tam-fil_pasos < tamMapa)? tam-fil_pasos : tamMapa;		//min(tam-fil_pasos,tamMapa)
+				inicio_j = 1;
+				tope_j = (col_pasos < tamMapa)? col_pasos : tamMapa;				//min(col_pasos,tamMapa)
+				
+				for (int i = inicio_i; i < tope_i; i++)
+					for (int j = inicio_j; j < tope_j; j++)
+						sum += mapaPisadas[fil_pasos+i][col_pasos-j];
+
+				valor[k] = sum / (tope_i-inicio_i)*(tope_j-inicio_j);
+			break;
+		}
+	}
+
+	if (valor[1] < valor[2])
+		girar_derecha = true;
+
+	return girar_derecha;
 }
 
 
