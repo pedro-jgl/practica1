@@ -531,90 +531,93 @@ int ComportamientoJugador:: salirAguaBosque(Sensores sensores){
 
 
 void ComportamientoJugador:: ultimoRelleno(){
-	vector< vector< int > > matriz;
-	vector< int > aux(tamMapa, 0);
-	int sum = 0;
+	for (int w = 0; w < 50; w++){
+		vector< vector< int > > matriz;
+		vector< int > aux(tamMapa, 0);
+		int sum = 0;
 
-	for (int i = 0; i < tamMapa; i++)
-		matriz.push_back(aux);
+		for (int i = 0; i < tamMapa; i++)
+			matriz.push_back(aux);
 
-	for (int i = 0; i < tamMapa; i++){
-		for (int j = 0; j < tamMapa; j++){
-			switch (mapaResultado[i][j])
-			{
-			case 'S':
-				matriz[i][j] = 1;
-			break;
-			case 'T':
-				matriz[i][j] = 2;
-			break;
-			case 'B':
-				matriz[i][j] = 3;
-			break;
-			case 'A':
-				matriz[i][j] = 4;
-			break;
-			case 'M':
-				matriz[i][j] = 5;
-			break;
-			case 'P':
-				matriz[i][j] = 6;
-			break;
-			case '?':
-				matriz[i][j] = 0;
-			break;
-			default:
-				matriz[i][j] = 1.5;
-			break;
-			}
-		}
-	}
-
-	for (int i = 0; i < tamMapa; i++){
-		for (int j = 0; j < tamMapa; j++){
-			if (i > 0 and j > 0 and i < tamMapa-1 and j < tamMapa-1){
-				if (matriz[i][j] == 0){
-					sum = 0;
-					for (int k = -1; k < 2; k++)
-						for (int h = -1; h < 2; h++)
-							if (h != 0 and k != 0)
-								sum += matriz[i+k][j+h];
-
-					matriz[i][j] = round(sum/8);
-				}
-			}
-		}
-	}
-
-
-	for (int i = 0; i < tamMapa; i++){
-		for (int j = 0; j < tamMapa; j++){
-			if (mapaResultado[i][j] == '?'){
-				switch (matriz[i][j]){
-				case 0:
-					mapaResultado[i][j] = 'S';
+		for (int i = 0; i < tamMapa; i++){
+			for (int j = 0; j < tamMapa; j++){
+				switch (mapaResultado[i][j])
+				{
+				case 'S':
+					matriz[i][j] = 1;
 				break;
-				case 1:
-					mapaResultado[i][j] = 'S';
+				case 'T':
+					matriz[i][j] = 2;
 				break;
-				case 2:
-					mapaResultado[i][j] = 'T';
+				case 'B':
+					matriz[i][j] = 3;
 				break;
-				case 3:
-					mapaResultado[i][j] = 'B';
+				case 'A':
+					matriz[i][j] = 4;
 				break;
-				case 4:
-					mapaResultado[i][j] = 'A';
+				case 'M':
+					matriz[i][j] = 5;
 				break;
-				case 5:
-					mapaResultado[i][j] = 'M';
+				case 'P':
+					matriz[i][j] = 6;
 				break;
-				case 6:
-					mapaResultado[i][j] = 'P';
+				case '?':
+					matriz[i][j] = 0;
+				break;
+				default:
+					matriz[i][j] = 1.5;
 				break;
 				}
 			}
 		}
+
+		for (int i = 0; i < tamMapa; i++){
+			for (int j = 0; j < tamMapa; j++){
+				if (i > 0 and j > 0 and i < tamMapa-1 and j < tamMapa-1){
+					if (matriz[i][j] == 0){
+						sum = 0;
+						for (int k = -1; k < 2; k++)
+							for (int h = -1; h < 2; h++)
+								if (h != 0 and k != 0)
+									sum += matriz[i+k][j+h];
+
+						matriz[i][j] = round(sum/8);
+					}
+				}
+			}
+		}
+
+
+		for (int i = 0; i < tamMapa; i++){
+			for (int j = 0; j < tamMapa; j++){
+				if (mapaResultado[i][j] == '?'){
+					switch (matriz[i][j]){
+					case 0:
+						mapaResultado[i][j] = '?';
+					break;
+					case 1:
+						mapaResultado[i][j] = 'S';
+					break;
+					case 2:
+						mapaResultado[i][j] = 'T';
+					break;
+					case 3:
+						mapaResultado[i][j] = 'B';
+					break;
+					case 4:
+						mapaResultado[i][j] = 'A';
+					break;
+					case 5:
+						mapaResultado[i][j] = 'M';
+					break;
+					case 6:
+						mapaResultado[i][j] = 'P';
+					break;
+					}
+				}
+			}
+		}
+	matriz.clear();
 	}
 
 }
