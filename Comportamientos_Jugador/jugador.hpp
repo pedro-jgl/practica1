@@ -40,9 +40,7 @@ class ComportamientoJugador : public Comportamiento{
       en_camino = false;
       bateria_llena = true;
       recuperarPisadas = false;
-      fil_aux = col_aux = 0;
       fuera = calculandoSalida = false;
-      nuevoDesfase_x = nuevoDesfase_y = desfase_antiguox = desfase_antiguoy = -1;
     }
 
     ComportamientoJugador(const ComportamientoJugador & comport) : Comportamiento(comport){}
@@ -53,7 +51,9 @@ class ComportamientoJugador : public Comportamiento{
     int interact(Action accion, int valor);
     int lugarMenosVisitado(int brujula);
     bool giraDerecha(int brujula);
-    bool salirAguaBosque(Sensores sensores);
+    int salirAguaBosque(Sensores sensores);
+    void ultimoRelleno();
+    bool acabaBateria(Sensores sensores, Action accion);
 
   private:
   
@@ -61,7 +61,7 @@ class ComportamientoJugador : public Comportamiento{
 
   //g_x, g_y guardan donde está la casilla 'G' de posicionamiento en nuestro mapaCiego para
   //poder trasladarlo al mapaResultado una vez posicionados
-  int fil, col, fil_pasos, col_pasos, brujula, tamMapa, desfase_x, desfase_y, fil_aux, col_aux, nuevoDesfase_x, nuevoDesfase_y, desfase_antiguox, desfase_antiguoy;
+  int fil, col, fil_pasos, col_pasos, brujula, tamMapa, desfase_x, desfase_y;
   bool girar_derecha, bien_situado, bikini, zapatillas, iniciado, en_camino, bateria_llena, recuperarPisadas, fuera, calculandoSalida;
   Action ultimaAccion;
   vector< vector< unsigned char> > mapaCiego;

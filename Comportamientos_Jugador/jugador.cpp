@@ -1,5 +1,6 @@
 #include "../Comportamientos_Jugador/jugador.hpp"
 #include <iostream>
+#include <math.h>
 using namespace std;
 
 
@@ -43,6 +44,8 @@ Action ComportamientoJugador::think(Sensores sensores){
 		fil = col = fil_pasos = col_pasos = TAM_MAX-1;
 		brujula = 0;
 		bien_situado = false;
+		zapatillas = false;
+		bikini = false;
 		punteroMapa = &mapaCiego;
 		
 		vectorAcciones.clear();
@@ -117,7 +120,10 @@ Action ComportamientoJugador::think(Sensores sensores){
 			for (int i = 0; i < 4; i++)
 				for (int j = -i; j <= i; j++){
 					(*punteroMapa)[fil-i][col+j] = sensores.terreno[i*(i+1)+j];
-					if (i*(i+1)+j == 0)
+					
+					if (sensores.terreno[i*(i+1)+j] == 'P' or sensores.terreno[i*(i+1)+j] == 'M')
+						mapaPisadas[fil_pasos-i][col_pasos+j] += 2.5;
+					else if (i*(i+1)+j == 0)
 						mapaPisadas[fil_pasos-i][col_pasos+j] += 1;
 					else if (i*(i+1)+j < 4)
 						mapaPisadas[fil_pasos-i][col_pasos+j] += 0.5;
@@ -130,7 +136,9 @@ Action ComportamientoJugador::think(Sensores sensores){
 				for (int i = -j; i <= j; i++){
 					(*punteroMapa)[fil+i][col+j] = sensores.terreno[j*(j+1)+i];
 
-					if (j*(j+1)+i == 0)
+					if (sensores.terreno[j*(j+1)+i] == 'P' or sensores.terreno[j*(j+1)+i] == 'M')
+						mapaPisadas[fil_pasos+i][col_pasos+j] += 2.5;
+					else if (j*(j+1)+i == 0)
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 1;
 					else if (j*(j+1)+i < 4)
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 0.5;
@@ -143,7 +151,9 @@ Action ComportamientoJugador::think(Sensores sensores){
 				for (int j = i; j >= -i; j--){
 					(*punteroMapa)[fil+i][col+j] = sensores.terreno[i*(i+1)-j];
 
-					if (i*(i+1)-j == 0)
+					if (sensores.terreno[i*(i+1)-j] == 'P' or sensores.terreno[i*(i+1)-j] == 'M')
+						mapaPisadas[fil_pasos+i][col_pasos+j] += 2.5;
+					else if (i*(i+1)-j == 0)
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 1;
 					else if (i*(i+1)-j < 4)
 						mapaPisadas[fil_pasos+i][col_pasos+j] += 0.5;
@@ -156,7 +166,9 @@ Action ComportamientoJugador::think(Sensores sensores){
 				for (int i = j; i >= -j; i--){
 					(*punteroMapa)[fil+i][col-j] = sensores.terreno[j*(j+1)-i];
 
-					if (j*(j+1)-i == 0)
+					if (sensores.terreno[j*(j+1)-i] == 'P' or sensores.terreno[j*(j+1)-i] == 'M')
+						mapaPisadas[fil_pasos+i][col_pasos-j] += 2.5;
+					else if (j*(j+1)-i == 0)
 						mapaPisadas[fil_pasos+i][col_pasos-j] += 1;
 					else if (j*(j+1)-i < 4)
 						mapaPisadas[fil_pasos+i][col_pasos-j] += 0.5;
@@ -170,9 +182,19 @@ Action ComportamientoJugador::think(Sensores sensores){
 		fuera = true;
 
 	if (!calculandoSalida and !fuera){
-		if ((sensores.terreno[0] == 'A' and sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[0] == 'B' and sensores.terreno[2] == 'B' and !zapatillas)){
-			if (!salirAguaBosque(sensores)){
+		if ((sensores.terreno[0] == 'A' and (sensores.terreno[2] == 'A' or sensores.terreno[2] == 'B' or sensores.terreno[2] == 'P' or sensores.terreno[2] == 'M') and !bikini) or (sensores.terreno[0] == 'B' and (sensores.terreno[2] == 'B' or sensores.terreno[2] == 'A' or sensores.terreno[2] == 'P' or sensores.terreno[2] == 'M') and !zapatillas)){
+			int resultado = salirAguaBosque(sensores);
+			if (0 == resultado){
 				vectorAcciones.push_back(actFORWARD);
+			}
+			else if (2 == resultado){
+				girar_derecha = rand()%2;
+				
+				if (girar_derecha)
+					vectorAcciones.push_back(actTURN_R);
+				else
+					vectorAcciones.push_back(actTURN_L);
+				
 			}
 			
 			calculandoSalida = true;
@@ -181,6 +203,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 			fuera = true;
 		
 	}
+
 
 	if (fuera){
 		//Decidir qué acción tomar
@@ -239,7 +262,6 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 		if (vectorAcciones.empty()){
 			int destino = lugarMenosVisitado(brujula);
-
 			calculaMovimientos(destino);
 			accion = vectorAcciones.back();
 			vectorAcciones.pop_back();
@@ -283,6 +305,8 @@ Action ComportamientoJugador::think(Sensores sensores){
 			calculandoSalida = false;
 	}
 	
+	if ( acabaBateria(sensores, accion) or sensores.vida == 1)
+		ultimoRelleno();
 
 
 	ultimaAccion = accion;
@@ -388,8 +412,8 @@ int ComportamientoJugador:: lugarMenosVisitado(int brujula){
 		break;
 	}
 
-	min = v[0];
-	pos_min = 0;
+	min = v[1];
+	pos_min = 1;
 	for (int i = 1; i < 16; i++){
 		if (v[i] < min){
 			pos_min = i;
@@ -477,21 +501,184 @@ bool ComportamientoJugador:: giraDerecha(int brujula){
 	return girar_derecha;
 }
 
-bool ComportamientoJugador:: salirAguaBosque(Sensores sensores){
+int ComportamientoJugador:: salirAguaBosque(Sensores sensores){
 	int pos = 0;
-	bool salida = false;
+	int salida = 0;
+	bool posible = false, salir = false;
 	
-	for (int i = 1; i < 16 and !salida; i++){
+	for (int i = 1; i < 16 and !salir; i++){
 		if ( sensores.terreno[i] != 'M' and sensores.terreno[i] != 'P' and sensores.superficie[i] == '_'  and (sensores.terreno[i] != 'A' or bikini) and (sensores.terreno[i] != 'B' or zapatillas) ){
-			salida = true;
+			salida = 1;
 			pos = i;
+			salir = true;
 		}
 	}
 
-	if (salida)
+	for (int i = 1; i < 4; i++){
+		if ( sensores.terreno[i] != 'M' and sensores.terreno[i] != 'P' ){
+			posible = true;
+		}
+	}
+
+	if (!posible)
+		salida = 2;
+
+	if (salida == 1)
 		calculaMovimientos(pos);
+
 	return salida;
 }
 
+
+void ComportamientoJugador:: ultimoRelleno(){
+	vector< vector< int > > matriz;
+	vector< int > aux(tamMapa, 0);
+	int sum = 0;
+
+	for (int i = 0; i < tamMapa; i++)
+		matriz.push_back(aux);
+
+	for (int i = 0; i < tamMapa; i++){
+		for (int j = 0; j < tamMapa; j++){
+			switch (mapaResultado[i][j])
+			{
+			case 'S':
+				matriz[i][j] = 1;
+			break;
+			case 'T':
+				matriz[i][j] = 2;
+			break;
+			case 'B':
+				matriz[i][j] = 3;
+			break;
+			case 'A':
+				matriz[i][j] = 4;
+			break;
+			case 'M':
+				matriz[i][j] = 5;
+			break;
+			case 'P':
+				matriz[i][j] = 6;
+			break;
+			case '?':
+				matriz[i][j] = 0;
+			break;
+			default:
+				matriz[i][j] = 1.5;
+			break;
+			}
+		}
+	}
+
+	for (int i = 0; i < tamMapa; i++){
+		for (int j = 0; j < tamMapa; j++){
+			if (i > 0 and j > 0 and i < tamMapa-1 and j < tamMapa-1){
+				if (matriz[i][j] == 0){
+					for (int k = -1; k < 2; k++)
+						for (int h = -1; h < 2; h++)
+							if (h != 0 and k != 0)
+								sum += matriz[i+k][j+h];
+
+					matriz[i][j] = round(sum/8);
+				}
+			}
+		}
+	}
+
+
+	for (int i = 0; i < tamMapa; i++){
+		for (int j = 0; j < tamMapa; j++){
+			if (mapaResultado[i][j] == '?'){
+				switch (matriz[i][j]){
+				case 0:
+					mapaResultado[i][j] = 'S';
+				break;
+				case 1:
+					mapaResultado[i][j] = 'S';
+				break;
+				case 2:
+					mapaResultado[i][j] = 'T';
+				break;
+				case 3:
+					mapaResultado[i][j] = 'B';
+				break;
+				case 4:
+					mapaResultado[i][j] = 'A';
+				break;
+				case 5:
+					mapaResultado[i][j] = 'M';
+				break;
+				case 6:
+					mapaResultado[i][j] = 'P';
+				break;
+				}
+			}
+		}
+	}
+
+}
+
+
+bool ComportamientoJugador:: acabaBateria(Sensores sensores, Action accion){
+	unsigned char pos = sensores.terreno[0];
+	int coste = 0;
+	bool acabaBate = false;
+
+	switch (accion){
+		case actFORWARD:
+			switch(pos){
+				case 'A':
+					coste = (bikini)? 10 : 200;
+				break;
+				case 'B':
+					coste = (zapatillas)? 15 : 100;
+				break;
+				case 'T':
+					coste = 2;
+				break;
+				default:
+					coste = 1;
+				break;
+			}
+		break;
+		case actTURN_L:
+			switch(pos){
+				case 'A':
+					coste = (bikini)? 5 : 500;
+				break;
+				case 'B':
+					coste = (zapatillas)? 1 : 3;
+				break;
+				case 'T':
+					coste = 2;
+				break;
+				default:
+					coste = 1;
+				break;
+			}
+		break;
+		case actTURN_R:
+			switch(pos){
+				case 'A':
+					coste = (bikini)? 5 : 500;
+				break;
+				case 'B':
+					coste = (zapatillas)? 1 : 3;
+				break;
+				case 'T':
+					coste = 2;
+				break;
+				default:
+					coste = 1;
+				break;
+			}
+		break;
+	}
+
+	if (sensores.bateria - coste <= 0)
+		acabaBate = true;
+
+	return acabaBate;
+}
 
 
