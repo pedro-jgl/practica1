@@ -48,12 +48,15 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 		ultimaAccion = actIDLE;
 
-		for (int i = 0; i < mapaPisadas.size(); i++)
+		if (algunaVezSituado){
 			for (int i = 0; i < mapaPisadas.size(); i++)
-				mapaPisadas_aux[i][j] = mapaPisadas[i][j];
+				for (int j = 0; j < mapaPisadas.size(); j++)
+					mapaPisadas_aux[i][j] = mapaPisadas[i][j];
+
+			recuperarPisadas = true;
+		}
 
 		mapaPisadas.clear();
-		recuperarPisadas = true;
 		vector<float> aux2(2*TAM_MAX, 0);
 
       	for (unsigned int i = 0; i < 2*TAM_MAX; i++)
@@ -109,7 +112,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 			//********************************************* ACABAR ESTE PASO ********************************************************************//
 			for (int i = 0; i < mapaPisadas_aux.size(); i++)
 				for (int j = 0; j < mapaPisadas_aux.size(); j++)
-					mapaPisadas[i][j] += mapaPisadas_aux[][];
+					mapaPisadas[i][j] += mapaPisadas_aux[i][j];
 			
 			mapaPisadas_aux.clear();
 			recuperarPisadas = false;
@@ -125,6 +128,8 @@ Action ComportamientoJugador::think(Sensores sensores){
 				if (mapaResultado[i][j] == '?'){
 					mapaResultado[i][j] = mapaCiego[i-desfase_x][j-desfase_y];
 				}
+		
+		algunaVezSituado = true;
 	}
 	
 
