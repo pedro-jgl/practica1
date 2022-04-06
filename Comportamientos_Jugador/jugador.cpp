@@ -118,13 +118,13 @@ Action ComportamientoJugador::think(Sensores sensores){
 			nuevoDesfase_y = desfase_antiguoy - desfase_y;
 			fil_aux = -nuevoDesfase_x;
 			col_aux = -nuevoDesfase_y;
-			for (int i = 0; i < mapaPisadas.size(); i++)
-				for (int j = 0; j < mapaPisadas.size(); j++){
+			for (int i = 0; i < 2*TAM_MAX; i++)
+				for (int j = 0; j < 2*TAM_MAX; j++){
 					col_aux++;
-					if (col_aux == mapaPisadas.size()){
+					if (col_aux == 2*TAM_MAX){
 						col_aux = 0;
 						fil_aux++;
-						fil_aux = fil_aux % mapaPisadas.size();
+						fil_aux = fil_aux % 2*TAM_MAX;
 					}
 
 					mapaPisadas[i][j] += mapaPisadas_aux[fil_aux][col_aux];
