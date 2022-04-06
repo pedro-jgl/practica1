@@ -33,6 +33,8 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 	//Actualizar variables de estado
 	if (sensores.reset){
+		primera_iter = true;
+
 		mapaCiego.clear();
 		vector<unsigned char> aux(2*TAM_MAX, '?');
 
@@ -244,7 +246,6 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 
 	if (vectorAcciones.empty()){
-		girar_derecha = (rand()%2==0);
 		int destino = lugarMenosVisitado(brujula);
 
 		calculaMovimientos(destino);
@@ -253,8 +254,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 
 		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_' or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
 			vectorAcciones.clear();
-			//girar_derecha = (rand()%2==0);
-			girar_derecha = giraDerecha(brujula);
+			girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : (rand()%2==0);	//Una de cada 5 veces gira aleatoriamente, para romper bucles.
 			accion = actTURN_L;
 			if (girar_derecha)
 				accion = actTURN_R;
@@ -267,7 +267,7 @@ Action ComportamientoJugador::think(Sensores sensores){
 		if (accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_'  or (sensores.terreno[2] == 'A' and !bikini) or (sensores.terreno[2] == 'B' and !zapatillas) ) ){
 			vectorAcciones.clear();
 			//girar_derecha = (rand()%2==0);
-			girar_derecha = giraDerecha(brujula);
+			girar_derecha = (rand()%5 < 4)? giraDerecha(brujula) : (rand()%2==0);
 			accion = actTURN_L;
 			if (girar_derecha)
 				accion = actTURN_R;
@@ -276,6 +276,9 @@ Action ComportamientoJugador::think(Sensores sensores){
 		if (vectorAcciones.empty())
 			en_camino = false;
 	}
+
+	if (primera_iter)
+		primera_iter = false;
 
 
 	ultimaAccion = accion;
@@ -468,6 +471,23 @@ bool ComportamientoJugador:: giraDerecha(int brujula){
 		girar_derecha = true;
 
 	return girar_derecha;
+}
+
+bool ComportamientoJugador:: salirAguaBosque(Sensores sensores){
+	int pos = 0;
+	bool salida = false;
+	
+	for (int i = 1; i < 16 and !salida; i++){
+		if ( sensores.terreno[i] != 'M' and sensores.terreno[i] != 'P' and sensores.superficie[i] == '_'  and (sensores.terreno[i] != 'A' or bikini) and (sensores.terreno[i] != 'B' or zapatillas) ){
+			salida = true;
+			pos = i;
+		}
+	}
+
+	if (salida)
+		calculaMovimientos(pos);
+	
+	return salida;
 }
 
 
