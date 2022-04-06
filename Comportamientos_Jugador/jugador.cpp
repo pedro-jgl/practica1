@@ -534,7 +534,7 @@ void ComportamientoJugador:: ultimoRelleno(){
 	for (int w = 0; w < 50; w++){
 		vector< vector< int > > matriz;
 		vector< int > aux(tamMapa, 0);
-		int sum = 0;
+		int sum = 0, relevantes = 0;
 
 		for (int i = 0; i < tamMapa; i++)
 			matriz.push_back(aux);
@@ -576,12 +576,17 @@ void ComportamientoJugador:: ultimoRelleno(){
 				if (i > 0 and j > 0 and i < tamMapa-1 and j < tamMapa-1){
 					if (matriz[i][j] == 0){
 						sum = 0;
+						relevantes = 0;
 						for (int k = -1; k < 2; k++)
 							for (int h = -1; h < 2; h++)
 								if (h != 0 and k != 0)
-									sum += matriz[i+k][j+h];
+									if (matriz[i+k][j+h] != 0){
+										sum += matriz[i+k][j+h];
+										relevantes++;
+									}
 
-						matriz[i][j] = round(sum/8);
+						if (relevantes != 0)
+							matriz[i][j] = round(sum/relevantes);
 					}
 				}
 			}
