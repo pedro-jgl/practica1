@@ -271,7 +271,6 @@ Action ComportamientoJugador::think(Sensores sensores){
 	else{
 		accion = vectorAcciones.back();
 		vectorAcciones.pop_back();
-		cout << "e" << endl;
 		if ( accion == actFORWARD and ( sensores.terreno[2] == 'M' or sensores.terreno[2] == 'P' or sensores.superficie[2] != '_'  ) ){
 				vectorAcciones.clear();
 				girar_derecha = rand()%2;
