@@ -574,6 +574,7 @@ void ComportamientoJugador:: ultimoRelleno(){
 		for (int j = 0; j < tamMapa; j++){
 			if (i > 0 and j > 0 and i < tamMapa-1 and j < tamMapa-1){
 				if (matriz[i][j] == 0){
+					sum = 0;
 					for (int k = -1; k < 2; k++)
 						for (int h = -1; h < 2; h++)
 							if (h != 0 and k != 0)
